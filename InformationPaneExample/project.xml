@@ -17,6 +17,7 @@
 	
 	<haxelib name="lime" />	
 	<haxelib name="peote-view" />
+	<haxelib name="peote-layout" />
 	
 	<!-- force compiling for a special opengl-es version (only set one of them) -->
 	<!-- this optimizes the build and forces no-runtimecheck for the gl-features -->
@@ -42,7 +43,7 @@
 	<!-- <haxedef name="dump=pretty output" /> -->
 	
 	<!-- for html5 and loading inside onPreloadComplete-event the assets need to be embed=true --> 
-	<assets path="assets" exclude="lime.svg" embed="false" />
+	<assets path="assets" embed="false" />
 	
 	<icon path="assets/lime.svg" />
 	
