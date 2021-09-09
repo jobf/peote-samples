@@ -1,5 +1,8 @@
 package;
 
+import lime.ui.KeyCode;
+import layoutable.LayoutableDisplay;
+import peote.layout.LayoutContainer;
 import lime.graphics.Image;
 import haxe.CallStack;
 import lime.app.Application;
@@ -12,7 +15,7 @@ import peote.view.Color;
 class Main extends Application {	
 	
 	var peoteView:PeoteView;
-	var display:Display;
+	var display:LayoutableDisplay;
 
 	override function onWindowCreate():Void {
 		switch (window.context.type) {
@@ -29,20 +32,32 @@ class Main extends Application {
 	// ------------------------------------------------------------
 	// --------------- SAMPLE STARTS HERE -------------------------
 	// ------------------------------------------------------------
+	var rootContainer:LayoutContainer;
 	var imageElement:ImageLayoutElement;
 
 	public function startSample(window:Window) {
 		peoteView = new PeoteView(window);
-		display = new Display(10, 10, window.width - 20, window.height - 20, Color.GREEN);
+		display = new LayoutableDisplay(peoteView, 10, 10, window.width - 20, window.height - 20);
 		peoteView.addDisplay(display);
 
 		imageElement = new ImageLayoutElement(display, 0, 0, 400, 300);
 
+		rootContainer = new Box(display);
+
+
 		Loader.image("assets/test0.png", (image:Image) -> {
 			imageElement.setImage(image);
-			peoteView.start();
+			init();
 		});
+		
 	}
+	
+	function init(){
+		rootContainer.init();
+		rootContainer.update(peoteView.width, peoteView.height);
+		peoteView.start();
+	}
+
 
 	// ------------------------------------------------------------
 	// ----------------- LIME EVENTS ------------------------------
@@ -54,8 +69,19 @@ class Main extends Application {
 
 	override function update(deltaTime:Int):Void {
 		// for game-logic update
-	}
+	}	
 
+	override function onKeyDown (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {
+		#if !web
+		switch (keyCode){
+			case KeyCode.ESCAPE:
+				this.window.close();
+			case _:
+				return;
+		}
+		#end
+	}
+	
 	// override function render(context:lime.graphics.RenderContext):Void {}
 	// override function onRenderContextLost ():Void trace(" --- WARNING: LOST RENDERCONTEXT --- ");
 	// override function onRenderContextRestored (context:lime.graphics.RenderContext):Void trace(" --- onRenderContextRestored --- ");

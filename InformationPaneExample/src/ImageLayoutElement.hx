@@ -1,3 +1,5 @@
+import peote.layout.LayoutContainer;
+import peote.layout.ILayoutElement;
 import peote.view.Display;
 import peote.view.Program;
 import peote.view.Buffer;
@@ -5,7 +7,7 @@ import lime.graphics.Image;
 import peote.view.Element;
 import peote.view.Texture;
 
-class ImageLayoutElement implements Element {
+class ImageLayoutElement implements Element implements ILayoutElement{
 	public function new(display:Display, positionX:Int, positionY:Int, width:Int, height:Int) {
 		this.display = display;
 		x = positionX;
@@ -30,6 +32,12 @@ class ImageLayoutElement implements Element {
 	@sizeX public var w:Int;
 	@sizeY public var h:Int;
 	// Element implementation end
+
+	// ILayoutElement implementation begin
+	public function updateByLayout(layoutContainer:LayoutContainer) {}
+	public function showByLayout() {}
+	public function hideByLayout() {}
+	// ILayoutElement implementation end
 
 	var display:Display;
 	var buffer:Buffer<ImageLayoutElement>;

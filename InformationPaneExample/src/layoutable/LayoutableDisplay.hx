@@ -16,7 +16,7 @@ class LayoutableDisplay extends Display implements ILayoutElement
 	var _peoteView:PeoteView;
 	var isVisible:Bool = false;
 
-	public function new(peoteView:PeoteView, color:Color=0x00000000) 
+	public function new(peoteView:PeoteView, x:Int, y:Int, width:Int, height:Int, color:Color = 0x00000000) 
 	{
 		_peoteView = peoteView;
 		super(0, 0, 0, 0, color);
