@@ -11,7 +11,7 @@ import peote.layout.ILayoutElement;
 
 class LayoutableDisplay extends Display implements ILayoutElement
 {
-	public var buffer:Buffer<LayoutableSprite>;
+	public var buffer:Buffer<BaseElement>;
 	public var program:Program;	
 	var _peoteView:PeoteView;
 	var isVisible:Bool = false;
@@ -19,10 +19,9 @@ class LayoutableDisplay extends Display implements ILayoutElement
 	public function new(peoteView:PeoteView, x:Int, y:Int, width:Int, height:Int, color:Color = 0x00000000) 
 	{
 		_peoteView = peoteView;
-		super(0, 0, 0, 0, color);
-		buffer = new Buffer<LayoutableSprite>(16,8);
+		super(x, y, width, height, color);
+		buffer = new Buffer<BaseElement>(16,8);
 		program = new Program(buffer);
-		LayoutableSprite.initProgram(program);
 		addProgram(program);
 	}
 	

@@ -9,8 +9,6 @@ import lime.app.Application;
 import lime.ui.Window;
 import utils.Loader;
 import peote.view.PeoteView;
-import peote.view.Display;
-import peote.view.Color;
 
 class Main extends Application {	
 	
@@ -33,14 +31,13 @@ class Main extends Application {
 	// --------------- SAMPLE STARTS HERE -------------------------
 	// ------------------------------------------------------------
 	var rootContainer:LayoutContainer;
-	var imageElement:ImageLayoutElement;
+	var imageElement:ImageElement;
 
 	public function startSample(window:Window) {
 		peoteView = new PeoteView(window);
 		display = new LayoutableDisplay(peoteView, 10, 10, window.width - 20, window.height - 20);
-		peoteView.addDisplay(display);
 
-		imageElement = new ImageLayoutElement(display, 0, 0, 400, 300);
+		imageElement = new ImageElement(display, 0, 0, 400, 300);
 
 		rootContainer = new Box(display);
 
