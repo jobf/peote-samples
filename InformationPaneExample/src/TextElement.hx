@@ -4,8 +4,8 @@ import peote.text.Line;
 import peote.view.Display;
 
 class TextElement extends BaseElement{
-	public function new(display:Display, pen:FontProgram<TextStyle>, x:Int, y:Int, width:Int, height:Int) {
-		super(display, x, y, width, height);
+	public function new(display:Display, pen:FontProgram<TextStyle>, x:Int, y:Int, width:Int, height:Int, zIndex:Int) {
+		super(display, x, y, width, height, zIndex);
         this.pen = pen;
         line = this.pen.createLine("", x, y);
 	}

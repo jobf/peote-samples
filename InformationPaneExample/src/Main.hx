@@ -43,13 +43,14 @@ class Main extends Application {
 
 		var assetPath = "assets/test0.png";
 		var font = new Font<TextStyle>('assets/fonts/hack_packed/config.json', null);
-		imageElement = new ImageElement(display, 0, 0, 400, 300);
+		imageElement = new ImageElement(display, 0, 0, 400, 300, -15);
 
 		Loader.image(assetPath, (image:Image) -> {
 			imageElement.setImage(image);
 			font.load((_) -> {
 				fontProgram = font.createFontProgram(new TextStyle());
-				footer = new TextElement(display, fontProgram, 0, 0, 400, 32);
+				fontProgram.zIndexEnabled = true;
+				footer = new TextElement(display, fontProgram, 0, 0, 400, 32, 0);
 				display.addProgram(fontProgram);
 				footer.setText(assetPath);
 				layout();

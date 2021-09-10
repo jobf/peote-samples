@@ -1,3 +1,4 @@
+import elements.ElementSimple;
 import peote.view.Color;
 import peote.layout.LayoutContainer;
 import peote.layout.ILayoutElement;
@@ -7,15 +8,26 @@ import peote.view.Buffer;
 import peote.view.Element;
 
 class BaseElement implements Element implements ILayoutElement {
-	public function new(display:Display, positionX:Int, positionY:Int, width:Int, height:Int) {
+	public function new(display:Display, positionX:Int, positionY:Int, width:Int, height:Int, zIndex:Int) {
 		this.display = display;
 		x = positionX;
 		y = positionY;
 		w = width;
 		h = height;
+		z = zIndex;
+		bgBuffer = new Buffer<ElementSimple>(1);
+		bgProgram = new Program(bgBuffer);
+		bgProgram.zIndexEnabled = true;
+		bgElement = new ElementSimple(x, y, w, h, 0x004400FF);
+		bgElement.z = z - 1;
+		bgBuffer.addElement(bgElement);
+		display.addProgram(bgProgram);
+
 		buffer = new Buffer<BaseElement>(1);
 		buffer.addElement(this);
 		program = new Program(buffer);
+		program.zIndexEnabled = true;
+		display.addProgram(program);
 	}
 
 	// Element implementation begin
@@ -23,7 +35,8 @@ class BaseElement implements Element implements ILayoutElement {
 	@posY public var y:Int;
 	@sizeX public var w:Int;
 	@sizeY public var h:Int;
-	@color("bgcolor") public var color:Color = 0x004400FF;
+	@zIndex public var z:Int;	
+
 	// Element implementation end
 	// ILayoutElement implementation begin
 
@@ -32,11 +45,16 @@ class BaseElement implements Element implements ILayoutElement {
 		y = Math.round(layoutContainer.y);
 		w = Math.round(layoutContainer.width);
 		h = Math.round(layoutContainer.height);
+		bgElement.x = x;
+		bgElement.y = y;
+		bgElement.w = w;
+		bgElement.h = h;
 	}
-
+	
 	public function updateByLayout(layoutContainer:LayoutContainer) {
 		update(layoutContainer);
 		buffer.updateElement(this);
+		bgBuffer.updateElement(bgElement);
 	}
 
 	public function showByLayout() {}
@@ -46,6 +64,10 @@ class BaseElement implements Element implements ILayoutElement {
 	// ILayoutElement implementation end
 	var display:Display;
 	var buffer:Buffer<BaseElement>;
+	var bgBuffer:Buffer<ElementSimple>;
+	var bgProgram:Program;
+	var bgElement:ElementSimple;
 
-	public var program(default, null):Program;
+	var program:Program;
+
 }
