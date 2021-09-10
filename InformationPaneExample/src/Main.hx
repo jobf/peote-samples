@@ -68,20 +68,13 @@ class Main extends Application {
 		rootContainer = new LayoutContainer(ContainerType.VBOX, display, {}, [
 			new Box(imageElement, {
 				width: display.width,
+				height: display.height
 			}),
 			new Box(footer, {
-				left: 0,
-				width: display.width,
+				left: display.x,
 				bottom: display.height
 			})
 		]);
-		// rootContainer = new Box(imageElement, [
-		// 	new Box(footer, {
-		// 		width: display.width,
-		// 		height: display.height,
-		// 		bottom: display.height
-		// 	})
-		// ]);
 	}
 
 	// ------------------------------------------------------------

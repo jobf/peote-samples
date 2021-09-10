@@ -1,3 +1,4 @@
+import peote.layout.LayoutContainer;
 import peote.text.FontProgram;
 import peote.text.Line;
 import peote.view.Display;
@@ -16,4 +17,10 @@ class TextElement extends BaseElement{
         pen.lineSetChars(line, text);
         pen.updateLine(line);
     }
+
+    override public function updateByLayout(layoutContainer:LayoutContainer) {
+		super.updateByLayout(layoutContainer);
+        pen.lineSetPosition(line, x, y);
+		pen.updateLine(line);
+	}
 }
