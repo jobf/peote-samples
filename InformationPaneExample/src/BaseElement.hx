@@ -36,8 +36,8 @@ class BaseElement implements Element implements ILayoutElement {
 	@posY public var y:Int;
 	@sizeX public var w:Int;
 	@sizeY public var h:Int;
-	@zIndex public var z:Int;	
-	@color public var c:Color = 0x00000000;
+	@zIndex public var z:Int = 0;	
+	// @color public var c:Color = 0x00000000;
 	// Element implementation end
 	// ILayoutElement implementation begin
 	public inline function updateGeometry(layoutContainer:LayoutContainer) {
@@ -80,7 +80,7 @@ class SimpleElement implements Element
 	@sizeX public var w:Int;
 	@sizeY public var h:Int;
 	@color public var c:Color;
-	@zIndex public var z:Int;	
+	@zIndex public var z:Int = 0;
 	
 	public function new(positionX:Int, positionY:Int, width:Int, height:Int, color:Color, zIndex:Int)
 	{
