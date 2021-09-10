@@ -26,6 +26,7 @@ class BaseElement implements Element implements ILayoutElement {
 		buffer = new Buffer<BaseElement>(1);
 		buffer.addElement(this);
 		program = new Program(buffer);
+		program.alphaEnabled = true;
 		program.zIndexEnabled = true;
 		this.display.addProgram(program);
 	}
@@ -36,7 +37,7 @@ class BaseElement implements Element implements ILayoutElement {
 	@sizeX public var w:Int;
 	@sizeY public var h:Int;
 	@zIndex public var z:Int;	
-
+	@color public var c:Color = 0x00000000;
 	// Element implementation end
 	// ILayoutElement implementation begin
 	public inline function updateGeometry(layoutContainer:LayoutContainer) {
