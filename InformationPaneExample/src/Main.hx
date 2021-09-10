@@ -1,5 +1,7 @@
 package;
 
+import peote.view.Program;
+import peote.view.Buffer;
 import peote.layout.ContainerType;
 import peote.text.FontProgram;
 import peote.text.Font;
@@ -43,14 +45,18 @@ class Main extends Application {
 
 		var assetPath = "assets/test0.png";
 		var font = new Font<TextStyle>('assets/fonts/hack_packed/config.json', null);
-		imageElement = new ImageElement(display, 0, 0, 400, 300, -15);
-
+		
+		var imageBuffer = new Buffer<ImageElement>(1);
+		var imageProgram = new Program(imageBuffer);
+		imageElement = new ImageElement(imageBuffer, imageProgram, 0, 0, 400, 300, -15);
+		display.addProgram(imageProgram);
+		
 		Loader.image(assetPath, (image:Image) -> {
 			imageElement.setImage(image);
 			font.load((_) -> {
+				var textBuffer = new Buffer<TextElement>(1);
 				fontProgram = font.createFontProgram(new TextStyle());
-				fontProgram.zIndexEnabled = true;
-				footer = new TextElement(display, fontProgram, 0, 0, 400, 32, 0);
+				footer = new TextElement(textBuffer, fontProgram, 0, 0, 400, 32, 0);
 				display.addProgram(fontProgram);
 				footer.setText(assetPath);
 				layout();

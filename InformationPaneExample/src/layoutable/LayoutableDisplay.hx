@@ -2,8 +2,6 @@ package layoutable;
 
 import peote.view.PeoteView;
 import peote.view.Display;
-import peote.view.Program;
-import peote.view.Buffer;
 import peote.view.Color;
 import peote.layout.LayoutContainer;
 
@@ -11,8 +9,6 @@ import peote.layout.ILayoutElement;
 
 class LayoutableDisplay extends Display implements ILayoutElement
 {
-	public var buffer:Buffer<BaseElement>;
-	public var program:Program;	
 	var _peoteView:PeoteView;
 	var isVisible:Bool = false;
 
@@ -20,9 +16,6 @@ class LayoutableDisplay extends Display implements ILayoutElement
 	{
 		_peoteView = peoteView;
 		super(x, y, width, height, color);
-		buffer = new Buffer<BaseElement>(16,8);
-		program = new Program(buffer);
-		addProgram(program);
 	}
 	
 	
