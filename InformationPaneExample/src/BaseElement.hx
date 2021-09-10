@@ -1,3 +1,4 @@
+import peote.view.Color;
 import peote.layout.LayoutContainer;
 import peote.layout.ILayoutElement;
 import peote.view.Display;
@@ -22,7 +23,7 @@ class BaseElement implements Element implements ILayoutElement {
 	@posY public var y:Int;
 	@sizeX public var w:Int;
 	@sizeY public var h:Int;
-
+	@color("bgcolor") public var color:Color = 0x004400FF;
 	// Element implementation end
 	// ILayoutElement implementation begin
 
