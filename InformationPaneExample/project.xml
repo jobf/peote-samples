@@ -18,6 +18,8 @@
 	<haxelib name="lime" />	
 	<haxelib name="peote-view" />
 	<haxelib name="peote-layout" />
+	<haxelib name="json2object" />
+	<haxelib name="peote-text" />
 	
 	<!-- force compiling for a special opengl-es version (only set one of them) -->
 	<!-- this optimizes the build and forces no-runtimecheck for the gl-features -->

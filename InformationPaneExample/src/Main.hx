@@ -1,5 +1,8 @@
 package;
 
+import peote.layout.ContainerType;
+import peote.text.FontProgram;
+import peote.text.Font;
 import lime.ui.KeyCode;
 import layoutable.LayoutableDisplay;
 import peote.layout.LayoutContainer;
@@ -10,10 +13,10 @@ import lime.ui.Window;
 import utils.Loader;
 import peote.view.PeoteView;
 
-class Main extends Application {	
-	
+class Main extends Application {
 	var peoteView:PeoteView;
 	var display:LayoutableDisplay;
+	var fontProgram:FontProgram<TextStyle>;
 
 	override function onWindowCreate():Void {
 		switch (window.context.type) {
@@ -32,29 +35,54 @@ class Main extends Application {
 	// ------------------------------------------------------------
 	var rootContainer:LayoutContainer;
 	var imageElement:ImageElement;
+	var footer:TextElement;
 
 	public function startSample(window:Window) {
 		peoteView = new PeoteView(window);
 		display = new LayoutableDisplay(peoteView, 10, 10, window.width - 20, window.height - 20);
 
+		var assetPath = "assets/test0.png";
+		var font = new Font<TextStyle>('assets/fonts/hack_packed/config.json', null);
 		imageElement = new ImageElement(display, 0, 0, 400, 300);
 
-		rootContainer = new Box(display);
-
-
-		Loader.image("assets/test0.png", (image:Image) -> {
+		Loader.image(assetPath, (image:Image) -> {
 			imageElement.setImage(image);
-			init();
+			font.load((_) -> {
+				fontProgram = font.createFontProgram(new TextStyle());
+				footer = new TextElement(display, fontProgram, 0, 0, 400, 32);
+				display.addProgram(fontProgram);
+				footer.setText(assetPath);
+				layout();
+				init();
+			});
 		});
-		
 	}
-	
-	function init(){
+
+	function init() {
 		rootContainer.init();
 		rootContainer.update(peoteView.width, peoteView.height);
 		peoteView.start();
 	}
 
+	function layout() {
+		rootContainer = new LayoutContainer(ContainerType.VBOX, display, {}, [
+			new Box(imageElement, {
+				width: display.width,
+			}),
+			new Box(footer, {
+				left: 0,
+				width: display.width,
+				bottom: display.height
+			})
+		]);
+		// rootContainer = new Box(imageElement, [
+		// 	new Box(footer, {
+		// 		width: display.width,
+		// 		height: display.height,
+		// 		bottom: display.height
+		// 	})
+		// ]);
+	}
 
 	// ------------------------------------------------------------
 	// ----------------- LIME EVENTS ------------------------------
@@ -66,11 +94,11 @@ class Main extends Application {
 
 	override function update(deltaTime:Int):Void {
 		// for game-logic update
-	}	
+	}
 
-	override function onKeyDown (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {
+	override function onKeyDown(keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {
 		#if !web
-		switch (keyCode){
+		switch (keyCode) {
 			case KeyCode.ESCAPE:
 				this.window.close();
 			case _:
@@ -78,7 +106,7 @@ class Main extends Application {
 		}
 		#end
 	}
-	
+
 	// override function render(context:lime.graphics.RenderContext):Void {}
 	// override function onRenderContextLost ():Void trace(" --- WARNING: LOST RENDERCONTEXT --- ");
 	// override function onRenderContextRestored (context:lime.graphics.RenderContext):Void trace(" --- onRenderContextRestored --- ");
