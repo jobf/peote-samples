@@ -1,4 +1,4 @@
-import elements.ElementSimple;
+
 import peote.view.Color;
 import peote.layout.LayoutContainer;
 import peote.layout.ILayoutElement;
@@ -15,19 +15,19 @@ class BaseElement implements Element implements ILayoutElement {
 		w = width;
 		h = height;
 		z = zIndex;
-		bgBuffer = new Buffer<ElementSimple>(1);
+
+		bgBuffer = new Buffer<SimpleElement>(1);
 		bgProgram = new Program(bgBuffer);
 		bgProgram.zIndexEnabled = true;
-		bgElement = new ElementSimple(x, y, w, h, 0x004400FF);
-		bgElement.z = z - 1;
+		bgElement = new SimpleElement(x, y, w, h, 0x00ff00ff, zIndex -1);
 		bgBuffer.addElement(bgElement);
-		display.addProgram(bgProgram);
+		this.display.addProgram(bgProgram);
 
 		buffer = new Buffer<BaseElement>(1);
 		buffer.addElement(this);
 		program = new Program(buffer);
 		program.zIndexEnabled = true;
-		display.addProgram(program);
+		this.display.addProgram(program);
 	}
 
 	// Element implementation begin
@@ -39,8 +39,7 @@ class BaseElement implements Element implements ILayoutElement {
 
 	// Element implementation end
 	// ILayoutElement implementation begin
-
-	public inline function update(layoutContainer:LayoutContainer) {
+	public inline function updateGeometry(layoutContainer:LayoutContainer) {
 		x = Math.round(layoutContainer.x);
 		y = Math.round(layoutContainer.y);
 		w = Math.round(layoutContainer.width);
@@ -52,7 +51,7 @@ class BaseElement implements Element implements ILayoutElement {
 	}
 	
 	public function updateByLayout(layoutContainer:LayoutContainer) {
-		update(layoutContainer);
+		updateGeometry(layoutContainer);
 		buffer.updateElement(this);
 		bgBuffer.updateElement(bgElement);
 	}
@@ -60,14 +59,35 @@ class BaseElement implements Element implements ILayoutElement {
 	public function showByLayout() {}
 
 	public function hideByLayout() {}
-
 	// ILayoutElement implementation end
+
 	var display:Display;
-	var buffer:Buffer<BaseElement>;
-	var bgBuffer:Buffer<ElementSimple>;
+	
+	var bgBuffer:Buffer<SimpleElement>;
 	var bgProgram:Program;
-	var bgElement:ElementSimple;
+	var bgElement:SimpleElement;
 
+	var buffer:Buffer<BaseElement>;
 	var program:Program;
+}
 
+
+class SimpleElement implements Element
+{
+	@posX public var x:Int=0; // signed 2 bytes integer
+	@posY public var y:Int=0; // signed 2 bytes integer
+	@sizeX public var w:Int;
+	@sizeY public var h:Int;
+	@color public var c:Color;
+	@zIndex public var z:Int;	
+	
+	public function new(positionX:Int, positionY:Int, width:Int, height:Int, color:Color, zIndex:Int)
+	{
+		x = positionX;
+		y = positionY;
+		w = width;
+		h = height;
+		c = color;
+		z = zIndex;
+	}
 }

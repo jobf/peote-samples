@@ -35,6 +35,7 @@ class Main extends Application {
 	// ------------------------------------------------------------
 	var rootContainer:LayoutContainer;
 	var imageElement:ImageElement;
+	var header:TextElement;
 	var footer:TextElement;
 
 	public function startSample(window:Window) {
@@ -43,16 +44,21 @@ class Main extends Application {
 
 		var assetPath = "assets/test0.png";
 		var font = new Font<TextStyle>('assets/fonts/hack_packed/config.json', null);
-		imageElement = new ImageElement(display, 0, 0, 400, 300, -15);
+		// imageElement = new ImageElement(display, 0, 0, 400, 300, -15);
 
 		Loader.image(assetPath, (image:Image) -> {
-			imageElement.setImage(image);
+			// imageElement.setImage(image);
 			font.load((_) -> {
 				fontProgram = font.createFontProgram(new TextStyle());
 				fontProgram.zIndexEnabled = true;
-				footer = new TextElement(display, fontProgram, 0, 0, 400, 32, 0);
+
+				// positions and size will be handled by layout
+				header = new TextElement(display, fontProgram, 0, 0, 0, 0, 0);
+				footer = new TextElement(display, fontProgram, 0, 0, 0, 0, 0);
+				
 				display.addProgram(fontProgram);
-				footer.setText(assetPath);
+				header.setText("top of the screen");
+				footer.setText("bottom of the screen");
 				layout();
 				init();
 			});
@@ -67,12 +73,13 @@ class Main extends Application {
 
 	function layout() {
 		rootContainer = new LayoutContainer(ContainerType.VBOX, display, {}, [
-			new Box(imageElement, {
-				width: display.width,
-				height: display.height
+			new Box(header, {
+				height: 32,
+				top: display.y,
 			}),
 			new Box(footer, {
 				left: display.x,
+				height: 32,
 				bottom: display.height
 			})
 		]);
