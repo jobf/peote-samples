@@ -37,7 +37,7 @@ class Main extends Application
 	public function startSample(window:Window)
 	{
 		peoteView = new PeoteView(window);
-		display = new Display(10, 10, window.width - 20, window.height - 20, Color.CYAN);
+		display = new Display(10, 10, window.width - 20, window.height - 20, Color.GREY4);
 		peoteView.addDisplay(display);
 	}
 	
@@ -65,6 +65,7 @@ class Main extends Application
 		// set up buffer for the tiles and add texture to program
 		var buffer_tiles = new Buffer<Tile>(256, 256, true);
 		var program_tiles = new Program(buffer_tiles);
+		program_tiles.alphaEnabled = true;
 		program_tiles.addTexture(texture_tiles, 'tiles');
 		
 		// add program to display
