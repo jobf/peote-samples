@@ -3,15 +3,15 @@ package;
 import peote.view.Element;
 import peote.view.Color;
 
-class Sprite implements Element
+class Tile implements Element
 {
 	// position in pixel (relative to upper left corner of Display)
-	@posX public var x:Int=0;
-	@posY public var y:Int=0;
+	@posX public var x:Int = 0;
+	@posY public var y:Int = 0;
 	
 	// size in pixel
-	@sizeX public var w:Int=100;
-	@sizeY public var h:Int=100;
+	@sizeX public var w:Int = 0;
+	@sizeY public var h:Int = 0;
 	
 	// rotation around pivot point
 	@rotation public var r:Float;
@@ -22,11 +22,11 @@ class Sprite implements Element
 	// pivot y (rotation offset)
 	@pivotY public var py:Int = 0;
 	
-	// color (RGBA)
-	@color public var c:Color = 0xff0000ff;
-	
 	// z-index
-	@zIndex public var z:Int = 0;	
-	
+	@zIndex public var z:Int = 0;
+
+	// the tile from the texture which this element should render
+	@texTile() public var tileId:Int = 0;
+
 	public function new() {}
 }
