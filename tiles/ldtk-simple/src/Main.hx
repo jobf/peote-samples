@@ -1,5 +1,7 @@
 package;
 
+import peote.view.Texture;
+import lime.utils.Assets;
 import haxe.CallStack;
 
 import lime.app.Application;
@@ -14,6 +16,9 @@ import peote.view.Color;
 
 class Main extends Application
 {
+	var peoteView:PeoteView;
+	var display:Display;
+
 	override function onWindowCreate():Void
 	{
 		switch (window.context.type)
@@ -31,17 +36,9 @@ class Main extends Application
 	
 	public function startSample(window:Window)
 	{
-		var peoteView = new PeoteView(window);
-
-		var buffer = new Buffer<Sprite>(4, 4, true);
-		var display = new Display(10, 10, window.width - 20, window.height - 20, Color.GREEN);
-		var program = new Program(buffer);
-
+		peoteView = new PeoteView(window);
+		display = new Display(10, 10, window.width - 20, window.height - 20, Color.CYAN);
 		peoteView.addDisplay(display);
-		display.addProgram(program);
-
-		var sprite = new Sprite();
-		buffer.addElement(sprite);
 	}
 	
 	// ------------------------------------------------------------
@@ -49,7 +46,63 @@ class Main extends Application
 	// ------------------------------------------------------------	
 
 	override function onPreloadComplete():Void {
-		// access embeded assets from here
+		/* access embeded assets from here */
+
+		// load ldtk level
+		var world = new World();
+		var level = world.levels[0];
+
+		// set up the texture from the tile set png
+		var image_tiles = Assets.getImage('assets/tiles-16x16.png');
+		var texture_tiles = new Texture(image_tiles.width, image_tiles.height);
+		texture_tiles.setImage(image_tiles);
+
+		// set the number of tiles in the texture using the tile size from ldtk tileset
+		var tile_size = level.l_Tiles.tileset.tileGridSize;
+		texture_tiles.tilesX = Std.int(image_tiles.width / tile_size);
+		texture_tiles.tilesY = Std.int(image_tiles.height / tile_size);
+
+		// set up buffer for the tiles and add texture to program
+		var buffer_tiles = new Buffer<Tile>(256, 256, true);
+		var program_tiles = new Program(buffer_tiles);
+		program_tiles.addTexture(texture_tiles, 'tiles');
+		
+		// add program to display
+		display.addProgram(program_tiles);
+
+		/* render tiles from ldtk */
+		
+		// loop over the level tile co-ordinates
+		for (cx in 0...level.l_Tiles.cWid) {
+			for (cy in 0...level.l_Tiles.cHei) {
+				// check if there is a tile at the co-ordinate before trying to render it
+				if(level.l_Tiles.hasAnyTileAt(cx, cy)){
+					
+					// ldtk can have multiple tiles on top of each other in a so called 'stack'
+					var tile_stack = level.l_Tiles.getTileStackAt(cx, cy);
+					
+					// iterate the stack
+					for(tile_info in tile_stack){
+						// init a new Tile element for each tile in the stack
+						var tile = new Tile();
+						
+						// set the x and y of the element based on cell position and grid size
+						tile.x = cx * level.l_Tiles.gridSize;
+						tile.y = cy * level.l_Tiles.gridSize;
+
+						// set the element size
+						tile.w = tile_size;
+						tile.h = tile_size;
+
+						// set the tileId to use the correct tile from the texture that was split into tiles
+						tile.tileId = tile_info.tileId;
+
+						// add element to buffer
+						buffer_tiles.addElement(tile);
+					}
+				}
+			}
+		}
 	}
 
 	override function update(deltaTime:Int):Void {
