@@ -14,6 +14,8 @@ import peote.view.Color;
 
 class Main extends Application
 {
+	var display:Display;
+
 	override function onWindowCreate():Void
 	{
 		switch (window.context.type)
@@ -34,7 +36,7 @@ class Main extends Application
 		var peoteView = new PeoteView(window);
 
 		var buffer = new Buffer<Sprite>(4, 4, true);
-		var display = new Display(10, 10, window.width - 20, window.height - 20, Color.GREEN);
+		display = new Display(10, 10, window.width - 20, window.height - 20, Color.GREEN);
 		var program = new Program(buffer);
 
 		peoteView.addDisplay(display);
@@ -101,7 +103,32 @@ class Main extends Application
 	// override function onTouchEnd (touch:lime.ui.Touch):Void {}
 	
 	// ----------------- KEYBOARD EVENTS ---------------------------
-	// override function onKeyDown (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {}	
+	override function onKeyDown (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {
+		switch keyCode {
+			case RIGHT: scroll_right();
+			case LEFT: scroll_left();
+			case DOWN: scroll_down();
+			case UP: scroll_up();
+			case _:
+		}
+	}	
+
+	function scroll_right() {
+		display.xOffset -= 128;
+	}
+	
+	function scroll_left() {
+		display.xOffset += 128;
+	}
+	
+	function scroll_down() {
+		display.yOffset -= 128;
+	}
+	
+	function scroll_up() {
+		display.yOffset += 128;
+	}
+
 	// override function onKeyUp (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {}
 
 	// -------------- other WINDOWS EVENTS ----------------------------
