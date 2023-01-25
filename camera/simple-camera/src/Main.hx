@@ -40,8 +40,36 @@ class Main extends Application
 		peoteView.addDisplay(display);
 		display.addProgram(program);
 
-		var sprite = new Sprite();
-		buffer.addElement(sprite);
+		var tile_map = [
+			"##########################################",
+			"#                                        #",
+			"#                                        #",
+			"#                   ####                 #",
+			"#                                        #",
+			"#                                 #      #",
+			"#                #                #      #",
+			"#      ###                        #      #",
+			"#                                        #",
+			"#                                        #",
+			"##########################################",
+		];
+
+		var char_code_wall = "#".charCodeAt(0);
+
+		var size_tile = 128;
+
+		for (y => row in tile_map) {
+			for(x in 0...row.length){
+				if(row.charCodeAt(x) == char_code_wall){
+					var sprite = new Sprite();
+					sprite.w = size_tile;
+					sprite.h = size_tile;
+					sprite.x = x * size_tile;
+					sprite.y = y * size_tile;
+					buffer.addElement(sprite);
+				}
+			}
+		}
 	}
 	
 	// ------------------------------------------------------------
