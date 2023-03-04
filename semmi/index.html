@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>../pages/semmi</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		* {
+			margin: 0;
+			padding: 0
+		}
+
+		body {
+			background-color: #fff;
+			color: #001742;
+			font-family: Arial, Helvetica, sans-serif;
+			margin: 5px;
+		}
+	</style>
+
+	
+	<link rel="stylesheet" href="../_scripts/highlightjs/styles/github-dark.min.css">
+	
+</head>
+
+<body>
+	
+	<iframe src="html5/bin/index.html" width="800" height="600"></iframe>
+<h1>semmi/</h1>
+<p></p>
+<pre>
+	<code class="language-haxe">
+package;
+
+import lime.app.Application;
+import lime.graphics.Image;
+
+import peote.view.PeoteView;
+import peote.view.Display;
+import peote.view.Program;
+import peote.view.Buffer;
+import peote.view.Texture;
+import peote.view.Color;
+
+import utils.Loader;
+
+class Main extends Application
+{	
+	override function onWindowCreate():Void
+	{		
+		switch (window.context.type)
+		{
+			case WEBGL, OPENGL, OPENGLES:
+				
+				var peoteView = new PeoteView(window, Color.GREY3);
+
+				var display = new Display(0, 0, 800, 590, Color.GREY6);
+				
+				var buffer = new Buffer<Semmi>(4, 4, true);
+				var program = new Program(buffer);
+				
+				Loader.image("assets/semmi_colors_by_yenoPenn.png", true, function(image:Image)
+				{
+					var texture = new Texture(image.width, image.height);
+					texture.setImage(image);
+					
+					program.addTexture(texture, "custom");					
+					program.snapToPixel(1); // for smooth animation
+
+					peoteView.addDisplay(display);
+					display.addProgram(program);
+					
+					buffer.addElement(new Semmi(0, 0, peoteView.time));
+					
+					peoteView.start();
+				});				
+				
+			default: throw("Sorry, only works with OpenGL.");			
+		}		
+	}		
+
+}
+
+	</code>
+</pre>
+
+</body>
+
+
+
+<script type="module">
+	import hljs from '../_scripts/highlightjs/es/core.min.js'
+	import haxe from '../_scripts/highlightjs/es/languages/haxe.min.js';
+	hljs.registerLanguage('haxe', haxe);
+	hljs.highlightAll();
+</script>
+
+
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>../pages/multipaint</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		* {
+			margin: 0;
+			padding: 0
+		}
+
+		body {
+			background-color: #fff;
+			color: #001742;
+			font-family: Arial, Helvetica, sans-serif;
+			margin: 5px;
+		}
+	</style>
+
+	
+	<link rel="stylesheet" href="../_scripts/highlightjs/styles/github-dark.min.css">
+	
+</head>
+
+<body>
+	
+	<iframe src="html5/bin/index.html" width="800" height="600"></iframe>
+<h1>multipaint/</h1>
+<p></p>
+<pre>
+	<code class="language-haxe">
+package;
+
+import haxe.CallStack;
+import lime.app.Application;
+import lime.ui.Window;
+
+
+class Main extends Application
+{
+	override function onWindowCreate():Void
+	{
+		switch (window.context.type)
+		{
+			case WEBGL, OPENGL, OPENGLES:
+				try startSample(window)
+				catch (_) trace(CallStack.toString(CallStack.exceptionStack()), _);
+			default: throw("Sorry, only works with OpenGL.");
+		}
+	}
+	
+	// ------------------------------------------------------------
+	// ------------- Create Server &! Client ----------------------
+	// ------------------------------------------------------------	
+	var host:String = "localhost";
+	var port:Int = 7680;
+
+	var channelName:String = "multipaint";
+	
+	
+	public function startSample(window:Window)
+	{
+
+		#if (server || (!client))
+		
+			trace('Server try to create channel "$channelName" at host:$host and port:$port');
+			var server = new Server( host, port, channelName
+				#if ((!server) && (!client))
+					,true // emulate network (to test locally without peote-server)
+				#end
+			);
+
+		#end
+		
+		
+		
+		#if (client || (!server))
+			
+			trace('Client try to enter servers channel "$channelName" at host:$host and port:$port');
+			var client = new Client(window, host, port, channelName);
+		
+		#end
+		
+	}
+	
+	
+}
+
+	</code>
+</pre>
+
+</body>
+
+
+
+<script type="module">
+	import hljs from '../_scripts/highlightjs/es/core.min.js'
+	import haxe from '../_scripts/highlightjs/es/languages/haxe.min.js';
+	hljs.registerLanguage('haxe', haxe);
+	hljs.highlightAll();
+</script>
+
+
+</html>

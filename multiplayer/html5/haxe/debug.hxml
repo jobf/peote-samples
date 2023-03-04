@@ -1,0 +1,27 @@
+-main ApplicationMain 
+-cp /peote-view/src
+-D peote-view=0.8.8
+--macro lime._internal.macros.DefineMacro.run()
+-cp /haxelib/lime/8,0,1/src
+-D lime=8.0.1
+-cp src
+-D tools=8.0.1
+-D lime-canvas
+-D howlerjs
+-D no-compilation
+-D peoteview_instancedrawing
+-D peoteview_vertexarrayobjects
+-D lime-webgl
+-D lime-dom
+-D lime-howlerjs
+-D lime-html5
+-D peoteview_uniformbuffers
+-D  no-deprecation-warnings
+-D html5
+-D web
+-dce full
+-js ../pages/multiplayer/html5/bin/Main.js
+-cp ../pages/multiplayer/html5/haxe
+-D html5
+-D html
+-debug
