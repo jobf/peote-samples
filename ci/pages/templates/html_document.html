@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>::TITLE::</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		* {
+			margin: 0;
+			padding: 0
+		}
+
+		body {
+			background-color: #fff;
+			color: #001742;
+			font-family: Arial, Helvetica, sans-serif;
+			margin: 5px;
+		}
+	</style>
+
+	::if IS_SAMPLE::
+	<link rel="stylesheet" href="::RELATIVES::/_scripts/highlightjs/styles/github-dark.min.css">
+	::end::
+</head>
+
+<body>
+	::if !IS_SAMPLE::
+	<h1>::TITLE::</h1>
+	::end::
+	::BODY_INNER::
+</body>
+
+
+::if IS_SAMPLE::
+<script type="module">
+	import hljs from '::RELATIVES::/_scripts/highlightjs/es/core.min.js'
+	import haxe from '::RELATIVES::/_scripts/highlightjs/es/languages/haxe.min.js';
+	hljs.registerLanguage('haxe', haxe);
+	hljs.highlightAll();
+</script>
+::end::
+
+</html>
