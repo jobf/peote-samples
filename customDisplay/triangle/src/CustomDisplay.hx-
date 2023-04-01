@@ -1,0 +1,207 @@
+package;
+
+import lime.graphics.Image;
+import lime.utils.Float32Array;
+import peote.view.PeoteView;
+import peote.view.Color;
+import peote.view.Display;
+import peote.view.PeoteGL.Version;
+import peote.view.UniformBufferView;
+import peote.view.UniformBufferDisplay;
+import lime.utils.Assets;
+import lime.graphics.opengl.GLBuffer;
+import lime.graphics.opengl.GLProgram;
+import lime.graphics.opengl.GLTexture;
+
+@:access(peote.view)
+class CustomDisplay extends Display 
+{
+	var image:Image;
+	private var glProgram:GLProgram;
+	var glVertexAttribute:Dynamic;
+	var glTextureAttribute:Dynamic;
+	var glMatrixUniform:Dynamic;
+	var glBuffer:Dynamic;
+	var glTexture:Dynamic;
+
+
+
+
+
+
+
+	
+	public function new(x:Int, y:Int, width:Int, height:Int, color:Color=0x00000000) 
+	{
+		super(x, y, width, height, color);
+		image = Assets.getImage ("assets/lime.png");
+	}
+	
+	#if peoteview_customdisplay // needs compiler condition to enable override
+	
+	override private function renderProgram(peoteView:PeoteView):Void
+	{
+		// to also render the other added Programs
+		// super.renderProgram(peoteView);
+		
+		// -----------------------------------------------
+		// ----------- ---- SHADERPROGRAM ----------------
+		// -----------------------------------------------
+					
+		var vertexSource = 
+			
+			"attribute vec4 aPosition;
+			attribute vec2 aTexCoord;
+			varying vec2 vTexCoord;
+			
+			uniform mat4 uMatrix;
+			
+			void main(void) {
+				
+				vTexCoord = aTexCoord;
+				gl_Position = uMatrix * aPosition;
+				
+			}";
+		
+		var fragmentSource = 
+			
+			#if !desktop
+			"precision mediump float;" +
+			#end
+			"varying vec2 vTexCoord;
+			uniform sampler2D uImage0;
+			
+			void main(void)
+			{
+				gl_FragColor = texture2D (uImage0, vTexCoord);
+			}";
+		
+		glProgram = GLProgram.fromSources (gl, vertexSource, fragmentSource);
+		gl.useProgram (glProgram);
+		
+		//  if (Version.isUBO)...
+		
+		// -----------------------------------------------
+		// ------------------- TEXTURES ------------------
+		// -----------------------------------------------
+		// ... (better later!)
+		
+		// -----------------------------------------------
+		// ------------------- UNIFORMS ------------------
+		// -----------------------------------------------
+		
+		if (Version.isUBO) // ------------- uniform block (ES3) -------------
+		{	
+			gl.bindBufferBase(gl.UNIFORM_BUFFER, UniformBufferView.block, peoteView.uniformBuffer.uniformBuffer);
+			gl.bindBufferBase(gl.UNIFORM_BUFFER, UniformBufferDisplay.block, uniformBuffer.uniformBuffer);
+		}
+		else // ------------- simple uniforms (ES2) -------------
+		{
+			//gl.uniform2f (uRESOLUTION, peoteView.width, peoteView.height);
+			//gl.uniform2f (uZOOM, peoteView.xz * display.xz, peoteView.yz * display.yz);
+			//gl.uniform2f (uOFFSET, (display.x + display.xOffset + peoteView.xOffset) / display.xz, 
+			//(display.y + display.yOffset + peoteView.yOffset) / display.yz);
+
+			glVertexAttribute = gl.getAttribLocation (glProgram, "aPosition");
+			glTextureAttribute = gl.getAttribLocation (glProgram, "aTexCoord");
+			glMatrixUniform = gl.getUniformLocation (glProgram, "uMatrix");
+			var imageUniform = gl.getUniformLocation (glProgram, "uImage0");
+			
+			gl.enableVertexAttribArray (glVertexAttribute);
+			gl.enableVertexAttribArray (glTextureAttribute);
+			gl.uniform1i (imageUniform, 0);
+		}
+									
+		gl.blendFunc (gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.enable (gl.BLEND);
+		
+		var data = [
+			
+			image.width, image.height, 0, 1, 1,
+			0, image.height, 0, 0, 1,
+			image.width, 0, 0, 1, 0,
+			0, 0, 0, 0, 0
+			
+		];
+		
+		glBuffer = gl.createBuffer ();
+		gl.bindBuffer (gl.ARRAY_BUFFER, glBuffer);
+		gl.bufferData (gl.ARRAY_BUFFER, 20, gl.STATIC_DRAW);
+		gl.bindBuffer (gl.ARRAY_BUFFER, null);
+		
+		glTexture = gl.createTexture ();
+		gl.bindTexture (gl.TEXTURE_2D, glTexture);
+		gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		
+		#if js
+		// todo
+		// gl.texImage2D (gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image.src);
+		#else
+		gl.texImage2D (gl.TEXTURE_2D, 0, gl.RGBA, image.buffer.width, image.buffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, image.data);
+		#end
+		
+		gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.bindTexture (gl.TEXTURE_2D, null);
+		
+		//gl.uniform1f (uTIME, peoteView.time);
+		
+		// ---------------------------------------
+		// --------------- FLAGS -----------------
+		// ---------------------------------------
+		
+		//peoteView.setColor(colorEnabled);
+		//peoteView.setGLDepth(zIndexEnabled);
+		//peoteView.setGLAlpha(alphaEnabled);
+		//peoteView.setMask(mask, clearMask);
+		
+		
+		// --------------------------------------------------
+		// -------------  VERTEX BUFFER DATA ----------------
+		// --------------------------------------------------
+		
+		// use vertex array object or not into binding your shader-attributes		
+		if (Version.isVAO) {
+			// gl.bindVertexArray( ... );
+		}
+		else {
+			// enable Vertex Attributes
+		}
+
+		// draw by instanced array (ES3) or without (ES2)
+		if (Version.isINSTANCED)
+		{
+			// gl.drawArraysInstanced ( ... );
+		}
+		else
+		{
+			// gl.drawArrays ( ... );
+		}
+		
+
+		// -----------------------------------------------------
+		// ---- cleaning up VAO, Buffer and shaderprogram ------
+		// -----------------------------------------------------
+		
+		if (Version.isVAO) {
+			// gl.bindVertexArray(null);
+		}
+		else {
+			// disable Vertex Attributes
+		}
+		
+		gl.bindBuffer (gl.ARRAY_BUFFER, null);		
+		gl.useProgram (null);
+	}	
+	
+	
+
+	
+	
+	// if Display is rendered into texture this is called instead:	
+	// override private function renderFramebufferProgram(peoteView:PeoteView):Void {}	
+	
+	
+	#end
+}
