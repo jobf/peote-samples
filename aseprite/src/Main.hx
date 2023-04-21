@@ -23,6 +23,8 @@ class Main extends Application {
 	// ------------------------------------------------------------
 	// --------------- SAMPLE STARTS HERE -------------------------
 	// ------------------------------------------------------------
+	var sprites:Array<Sprite>;
+
 	function startSample(window:Window) {
 		var peoteView = new PeoteView(window);
 		var display = new Display(10, 10, window.width - 20, window.height - 20, Color.BLACK);
@@ -30,29 +32,46 @@ class Main extends Application {
 
 		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle.ase');
 		var ase:Ase = Ase.fromBytes(data);
-		
+
 		var frame = ase.frames[0];
-		
+
 		var x = 100;
 		var y = 100;
-		for (layer_index => layer in ase.layers) {
-			trace(layer.name);
-			var cel = frame.cel(layer_index);
-			var data = new TextureData(cel.width, cel.height, UInt8Array.fromBytes(cel.pixelData));
-			var texture = new Texture(ase.width, ase.height);
-			texture.setImage(data);
-			
-			var buffer = new Buffer<Sprite>(1);
-			var program = new Program(buffer);
-			display.addProgram(program);
-			
-			program.addTexture(texture, 'layer$layer_index');
-			var sprite = new Sprite(x + cel.xPosition, y + cel.yPosition, ase.width, ase.height, 0);
-			buffer.addElement(sprite);
 
-			trace('cell ${cel.width} ${cel.height} : ${cel.xPosition},${cel.yPosition}');
-			trace('ase ${ase.width} ${ase.height}');
+		var layer_count = ase.layers.length;
+		var frame_count = ase.frames.length;
+
+		var image_slots = frame_count;
+		var textures:Array<Texture> = [];
+		var programs:Array<Program> = [];
+		var buffers:Array<Buffer<Sprite>> = [];
+
+		for (layer_index in 0...layer_count) {
+			textures.push(new Texture(ase.width, ase.height, image_slots));
+			buffers.push(new Buffer<Sprite>(layer_count * frame_count));
+
+			var program = new Program(buffers[layer_index]);
+			program.addTexture(textures[layer_index], 'layer$layer_index');
+			programs.push(program);
+			display.addProgram(program);
 		}
+
+		for (frame_index => frame in ase.frames) {
+			for (layer_index in 0...layer_count) {
+				var cel = frame.cel(layer_index);
+				var data = new TextureData(cel.width, cel.height, UInt8Array.fromBytes(cel.pixelData));
+				textures[layer_index].setImage(data, frame_index);
+			}
+		}
+
+		sprites = [];
+		var image_slot = 0;
+		for (layer_index in 0...layer_count) {
+			var cel = frame.cel(layer_index);
+			sprites.push(new Sprite(x + cel.xPosition, y + cel.yPosition, ase.width, ase.height, image_slot));
+			buffers[layer_index].addElement(sprites[layer_index]);
+		}
+
 	}
 
 	// ------------------------------------------------------------

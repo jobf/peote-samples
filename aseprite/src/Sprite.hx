@@ -10,13 +10,13 @@ class Sprite implements Element {
 	@varying @sizeX public var w:Int;
 	@varying @sizeY public var h:Int;
 
-	@texTile() public var tile:Int;
+	@texSlot() public var tile:Int;
 
-	public function new(x:Int, y:Int, width:Int, height:Int, tileId:Int) {
+	public function new(x:Int, y:Int, width:Int, height:Int, texSlot:Int) {
 		this.x = x;
 		this.y = y;
 		this.w = width;
 		this.h = height;
-		tile = tileId;
+		tile = texSlot;
 	}
 }
