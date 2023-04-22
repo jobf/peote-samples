@@ -38,7 +38,7 @@ class Main extends Application {
 		peoteView.addDisplay(display);
 		
 		// retrieve the ase file from assets and read it with Ase library
-		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle2-1t.ase');
+		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle.ase');
 		ase = Ase.fromBytes(data);
 
 		/*
