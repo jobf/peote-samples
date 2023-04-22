@@ -72,7 +72,8 @@ class Main extends Application {
 		sprites = [];
 		var image_slot = 0;
 		for (layer_index in 0...layer_count) {
-			sprites.push(new Sprite(sprite_x , sprite_y , ase.width, ase.height, image_slot));
+			var cel = frame.cel(layer_index);
+			sprites.push(new Sprite(sprite_x , sprite_y , ase.width, ase.height, image_slot, cel.xPosition, cel.yPosition));
 			buffers[layer_index].addElement(sprites[layer_index]);
 		}
 
@@ -104,8 +105,8 @@ class Main extends Application {
 
 				var sprite = sprites[layer_index];
 				sprite.tile = frame_index;
-				sprite.x = sprite_x + cel.xPosition;
-				sprite.y = sprite_y + cel.yPosition;
+				sprite.x_offset = cel.xPosition;
+				sprite.y_offset = cel.yPosition;
 
 				buffers[layer_index].updateElement(sprite);
 			}
