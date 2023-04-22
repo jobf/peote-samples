@@ -24,6 +24,11 @@ class Main extends Application {
 	// --------------- SAMPLE STARTS HERE -------------------------
 	// ------------------------------------------------------------
 	var sprites:Array<Sprite>;
+	var buffers:Array<Buffer<Sprite>>;
+	var layer_count:Int;
+	var ase:Ase;
+	var sprite_x:Int;
+	var sprite_y:Int;
 
 	function startSample(window:Window) {
 		var peoteView = new PeoteView(window);
@@ -31,20 +36,20 @@ class Main extends Application {
 		peoteView.addDisplay(display);
 
 		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle.ase');
-		var ase:Ase = Ase.fromBytes(data);
+		ase = Ase.fromBytes(data);
 
 		var frame = ase.frames[0];
 
-		var x = 100;
-		var y = 100;
+		sprite_x = 100;
+		sprite_y = 100;
 
-		var layer_count = ase.layers.length;
+		layer_count = ase.layers.length;
 		var frame_count = ase.frames.length;
 
 		var image_slots = frame_count;
 		var textures:Array<Texture> = [];
 		var programs:Array<Program> = [];
-		var buffers:Array<Buffer<Sprite>> = [];
+		buffers = [];
 
 		for (layer_index in 0...layer_count) {
 			textures.push(new Texture(ase.width, ase.height, image_slots));
@@ -67,8 +72,7 @@ class Main extends Application {
 		sprites = [];
 		var image_slot = 0;
 		for (layer_index in 0...layer_count) {
-			var cel = frame.cel(layer_index);
-			sprites.push(new Sprite(x + cel.xPosition, y + cel.yPosition, ase.width, ase.height, image_slot));
+			sprites.push(new Sprite(sprite_x , sprite_y , ase.width, ase.height, image_slot));
 			buffers[layer_index].addElement(sprites[layer_index]);
 		}
 
@@ -90,8 +94,30 @@ class Main extends Application {
 		}
 	}
 
+	var animation_frame_rate:Int = 16;
+	var animation_count_down:Int = 0;
+	var frame_index = 0;
 	override function update(deltaTime:Int):Void {
-		// for game-logic update
+		if(animation_count_down <= 0){
+			for (layer_index in 0...layer_count) {
+				var cel = ase.frames[frame_index].cel(layer_index);
+
+				var sprite = sprites[layer_index];
+				sprite.tile = frame_index;
+				sprite.x = sprite_x + cel.xPosition;
+				sprite.y = sprite_y + cel.yPosition;
+
+				buffers[layer_index].updateElement(sprite);
+			}
+
+			frame_index++;
+			if(frame_index > ase.frames.length - 1){
+				frame_index = 0;
+			}
+
+			animation_count_down = animation_frame_rate;
+		}
+		animation_count_down--;
 	}
 
 	// override function render(context:lime.graphics.RenderContext):Void {}
