@@ -29,10 +29,11 @@ class Main extends Application {
 	var ase:Ase;
 	var sprite_x:Int;
 	var sprite_y:Int;
+	var display:Display;
 
 	function startSample(window:Window) {
 		var peoteView = new PeoteView(window);
-		var display = new Display(10, 10, window.width - 20, window.height - 20, Color.BLACK);
+		display = new Display(10, 10, window.width - 20, window.height - 20, Color.BLACK);
 		peoteView.addDisplay(display);
 
 		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle.ase');
@@ -73,10 +74,9 @@ class Main extends Application {
 		var image_slot = 0;
 		for (layer_index in 0...layer_count) {
 			var cel = frame.cel(layer_index);
-			sprites.push(new Sprite(sprite_x , sprite_y , ase.width, ase.height, image_slot, cel.xPosition, cel.yPosition));
+			sprites.push(new Sprite(sprite_x, sprite_y, ase.width, ase.height, image_slot, cel.xPosition, cel.yPosition));
 			buffers[layer_index].addElement(sprites[layer_index]);
 		}
-
 	}
 
 	// ------------------------------------------------------------
@@ -95,11 +95,12 @@ class Main extends Application {
 		}
 	}
 
-	var animation_frame_rate:Int = 16;
+	var animation_frame_skip:Int = 8;
 	var animation_count_down:Int = 0;
 	var frame_index = 0;
+
 	override function update(deltaTime:Int):Void {
-		if(animation_count_down <= 0){
+		if (animation_count_down <= 0) {
 			for (layer_index in 0...layer_count) {
 				var cel = ase.frames[frame_index].cel(layer_index);
 
@@ -107,16 +108,19 @@ class Main extends Application {
 				sprite.tile = frame_index;
 				sprite.x_offset = cel.xPosition;
 				sprite.y_offset = cel.yPosition;
-
+				sprite.x += 10;
+				if (sprite.x >= display.width) {
+					sprite.x = display.x - sprite.w;
+				}
 				buffers[layer_index].updateElement(sprite);
 			}
 
 			frame_index++;
-			if(frame_index > ase.frames.length - 1){
+			if (frame_index > ase.frames.length - 1) {
 				frame_index = 0;
 			}
 
-			animation_count_down = animation_frame_rate;
+			animation_count_down = animation_frame_skip;
 		}
 		animation_count_down--;
 	}
