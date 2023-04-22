@@ -13,64 +13,97 @@ import peote.view.Buffer;
 import peote.view.Display;
 import peote.view.Program;
 import peote.view.Color;
+
 import ase.Ase;
 
 class Main extends Application {
 	// ------------------------------------------------------------
 	// --------------- SAMPLE STARTS HERE -------------------------
 	// ------------------------------------------------------------
+	var ase:Ase;
+	var frame_index:Int;
+	var frame_duration_remaining:Int;
+
 	var sprites:Array<Sprite>;
 	var buffers:Array<Buffer<Sprite>>;
-	var layer_count:Int;
-	var ase:Ase;
-	var sprite_x:Int;
-	var sprite_y:Int;
+
+	var sprite_x:Int = 96;
+	var sprite_y:Int = 96;
+
 	var display:Display;
 
 	function startSample(window:Window) {
 		var peoteView = new PeoteView(window);
-		display = new Display(10, 10, window.width - 20, window.height - 20, Color.BLACK);
+		display = new Display(0, 0, window.width, window.height, Color.GREY1);
 		peoteView.addDisplay(display);
-
-		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle.ase');
+		
+		// retrieve the ase file from assets and read it with Ase library
+		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle2-1t.ase');
 		ase = Ase.fromBytes(data);
 
-		var frame = ase.frames[0];
+		/*
+		The file contains animation frames and infomration on how to display them.
 
-		sprite_x = 100;
-		sprite_y = 100;
+		Each frame has multiple layers of pixel data stored in cels.
 
-		layer_count = ase.layers.length;
-		var frame_count = ase.frames.length;
+		A layer will be constructed using the following peote-view objects
+		 - texture
+		 - program
+		 - buffer
+		 - sprite
+		*/
 
-		var image_slots = frame_count;
+		// initiliase the layer collections
+		var layer_count = ase.layers.length;
 		var textures:Array<Texture> = [];
 		var programs:Array<Program> = [];
 		buffers = [];
+		sprites = [];
 
+		// iterate the layers data and instance the peote-view objects
 		for (layer_index in 0...layer_count) {
-			textures.push(new Texture(ase.width, ase.height, image_slots));
-			buffers.push(new Buffer<Sprite>(layer_count * frame_count));
 
-			var program = new Program(buffers[layer_index]);
-			program.addTexture(textures[layer_index], 'layer$layer_index');
+			// init layer texture - ase.width and ase.height are the dimensions of the frame
+			var texture = new Texture(ase.width, ase.height, ase.frames.length);
+			textures.push(texture);
+
+			// init layer buffer - only need 1 element in each 
+			var buffer = new Buffer<Sprite>(1);
+			buffers.push(buffer);
+
+			// init layer program
+			var program = new Program(buffer);
 			programs.push(program);
+			// add program to display so it can be displayed
 			display.addProgram(program);
+			// let the program access the texture
+			program.addTexture(textures[layer_index], 'layer$layer_index');
 		}
 
+		// iterate the frames data and read cel data
+		// each cel is an image and gets it's own image slot in the layer texture
 		for (frame_index => frame in ase.frames) {
 			for (layer_index in 0...layer_count) {
 				var cel = frame.cel(layer_index);
 				var data = new TextureData(cel.width, cel.height, UInt8Array.fromBytes(cel.pixelData));
+				// note that image slot == frame index
 				textures[layer_index].setImage(data, frame_index);
 			}
 		}
 
-		sprites = [];
-		var image_slot = 0;
-		for (layer_index in 0...layer_count) {
+		// init the first frame of the animation, index 0
+		frame_index = 0;
+		var frame = ase.frames[frame_index];
+		frame_duration_remaining = frame.duration;
+		trace('frame_duration $frame_duration_remaining');
+		// iterate layers and init Sprite for each layer of the frame
+		for (layer_index in 0...ase.layers.length) {
 			var cel = frame.cel(layer_index);
-			sprites.push(new Sprite(sprite_x, sprite_y, ase.width, ase.height, image_slot, cel.xPosition, cel.yPosition));
+			// a cel can be smaller than the frame so has xPosition and yPosition
+			// the cel position tells us where to render the cel offset from the Sprite position
+			var sprite = new Sprite(sprite_x, sprite_y, ase.width, ase.height, frame_index, cel.xPosition, cel.yPosition);
+			sprites.push(sprite);
+			// put Sprite in buffer so it can be displayed
 			buffers[layer_index].addElement(sprites[layer_index]);
 		}
 	}
@@ -91,34 +124,47 @@ class Main extends Application {
 		}
 	}
 
-	var animation_frame_skip:Int = 8;
-	var animation_count_down:Int = 0;
-	var frame_index = 0;
-
 	override function update(deltaTime:Int):Void {
-		if (animation_count_down <= 0) {
-			for (layer_index in 0...layer_count) {
-				var cel = ase.frames[frame_index].cel(layer_index);
+		// reduce the remaining frame time by the milliseconds ast since last render
+		frame_duration_remaining -= deltaTime;
+		// if there is no more duration to wait, set up next frame
+		if (frame_duration_remaining <= 0) {
 
-				var sprite = sprites[layer_index];
-				sprite.tile = frame_index;
-				sprite.x_offset = cel.xPosition;
-				sprite.y_offset = cel.yPosition;
-				sprite.x += 10;
-				if (sprite.x >= display.width) {
-					sprite.x = display.x - sprite.w;
-				}
-				buffers[layer_index].updateElement(sprite);
-			}
-
+			// increase frame index counter
 			frame_index++;
 			if (frame_index > ase.frames.length - 1) {
+				// if we reached the final frame then reset the frame index counter
 				frame_index = 0;
 			}
 
-			animation_count_down = animation_frame_skip;
+			// set up next frame of animation
+			var frame = ase.frames[frame_index];
+
+			// each frame can have it's own duration to be displayed
+			frame_duration_remaining = frame.duration;
+
+			// iterate the layers and update each Sprite
+			for (layer_index in 0...ase.layers.length) {
+				var sprite = sprites[layer_index];
+				// each image slot is a frame of the animation
+				sprite.image_slot = frame_index;
+
+				// offset the sprite by cell position
+				var cel = frame.cel(layer_index);
+				sprite.x_offset = cel.xPosition;
+				sprite.y_offset = cel.yPosition;
+
+				// here we move the sprite across the screen to the right, for extra fun
+				sprite.x += 10;
+				if (sprite.x >= display.width) {
+					// when the sprite has exited the screen right, move it to the screen left
+					sprite.x = display.x - sprite.w;
+				}
+
+				// update the element in the buffer to apply changes
+				buffers[layer_index].updateElement(sprite);
+			}
 		}
-		animation_count_down--;
 	}
 
 	// override function render(context:lime.graphics.RenderContext):Void {}
