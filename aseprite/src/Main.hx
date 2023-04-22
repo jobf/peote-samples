@@ -27,9 +27,6 @@ class Main extends Application {
 	var sprites:Array<Sprite>;
 	var buffers:Array<Buffer<Sprite>>;
 
-	var sprite_x:Int = 96;
-	var sprite_y:Int = 96;
-
 	var display:Display;
 
 	function startSample(window:Window) {
@@ -42,7 +39,7 @@ class Main extends Application {
 		ase = Ase.fromBytes(data);
 
 		/*
-		The file contains animation frames and infomration on how to display them.
+		The file contains animation frames and information on how to display them.
 
 		Each frame has multiple layers of pixel data stored in cels.
 
@@ -54,13 +51,13 @@ class Main extends Application {
 		*/
 
 		// initiliase the layer collections
-		var layer_count = ase.layers.length;
 		var textures:Array<Texture> = [];
 		var programs:Array<Program> = [];
 		buffers = [];
 		sprites = [];
-
+		
 		// iterate the layers data and instance the peote-view objects
+		var layer_count = ase.layers.length;
 		for (layer_index in 0...layer_count) {
 
 			// init layer texture - ase.width and ase.height are the dimensions of the frame
@@ -97,10 +94,13 @@ class Main extends Application {
 		frame_duration_remaining = frame.duration;
 		trace('frame_duration $frame_duration_remaining');
 		// iterate layers and init Sprite for each layer of the frame
+		var sprite_x:Int = 96;
+		var sprite_y:Int = 96;
 		for (layer_index in 0...ase.layers.length) {
 			var cel = frame.cel(layer_index);
 			// a cel can be smaller than the frame so has xPosition and yPosition
-			// the cel position tells us where to render the cel offset from the Sprite position
+			// the cel position tells us where to render the cel offset from the frame x and y
+			// frame x and y is equivalent to sprite x and y
 			var sprite = new Sprite(sprite_x, sprite_y, ase.width, ase.height, frame_index, cel.xPosition, cel.yPosition);
 			sprites.push(sprite);
 			// put Sprite in buffer so it can be displayed
@@ -125,7 +125,7 @@ class Main extends Application {
 	}
 
 	override function update(deltaTime:Int):Void {
-		// reduce the remaining frame time by the milliseconds ast since last render
+		// reduce the remaining frame time by the milliseconds elapsed since last render
 		frame_duration_remaining -= deltaTime;
 		// if there is no more duration to wait, set up next frame
 		if (frame_duration_remaining <= 0) {
