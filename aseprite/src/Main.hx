@@ -14,7 +14,7 @@ import peote.view.Display;
 import peote.view.Program;
 import peote.view.Color;
 
-import ase.Ase;
+import ase.Ase; // get from https://github.com/miriti/ase
 
 class Main extends Application {
 	// ------------------------------------------------------------
