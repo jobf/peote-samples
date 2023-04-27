@@ -33,6 +33,7 @@ class Main extends Application {
 		var peoteView = new PeoteView(window);
 		display = new Display(0, 0, window.width, window.height, Color.GREY1);
 		peoteView.addDisplay(display);
+		display.zoom = 3;
 		
 		// retrieve the ase file from assets and read it with Ase library
 		var data:Bytes = Assets.getBytes('assets/aseprite/48_run_cycle.ase');
@@ -155,9 +156,10 @@ class Main extends Application {
 				sprite.y_offset = cel.yPosition;
 
 				// here we move the sprite across the screen to the right, for extra fun
-				sprite.x += 10;
-				if (sprite.x >= display.width) {
-					// when the sprite has exited the screen right, move it to the screen left
+				sprite.x += 6;
+				// when the sprite has exited the screen right, move it to the screen left
+				// note that the edge of the visible screen is 1/3 of the display width because the display has a zoom level of 3
+				if (sprite.x >= (display.width / 3)) {
 					sprite.x = display.x - sprite.w;
 				}
 
@@ -181,7 +183,9 @@ class Main extends Application {
 	// override function onTouchMove (touch:lime.ui.Touch):Void	{}
 	// override function onTouchEnd (touch:lime.ui.Touch):Void {}
 	// ----------------- KEYBOARD EVENTS ---------------------------
-	// override function onKeyDown (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {}
+	override function onKeyDown (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {
+		super.onKeyDown(keyCode, modifier);
+	}
 	// override function onKeyUp (keyCode:lime.ui.KeyCode, modifier:lime.ui.KeyModifier):Void {}
 	// -------------- other WINDOWS EVENTS ----------------------------
 	// override function onWindowResize (width:Int, height:Int):Void { trace("onWindowResize", width, height); }
