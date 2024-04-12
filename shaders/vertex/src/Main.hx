@@ -44,7 +44,7 @@ class Main extends Application
 		{
 			var texture = new Texture(image.width, image.height);
 			//var texture = new Texture(image.width, image.height, 1, 4, true);
-			texture.setImage(image);
+			texture.setData(image);
 			
 			Shaking.init(display, texture);
 			shaking = new Shaking(20, 20, 200, 150);

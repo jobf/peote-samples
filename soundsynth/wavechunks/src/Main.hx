@@ -7,6 +7,7 @@ import peote.view.PeoteView;
 import peote.view.Display;
 import peote.view.Color;
 import peote.view.Texture;
+import peote.view.TextureFormat;
 
 class Main extends Application {
 	
@@ -51,7 +52,7 @@ class Main extends Application {
 		
 		
 		// create and render it into texture
-		texture = new Texture(441, 25, 1, 4, false, 0, 0, true);
+		texture = new Texture(441, 25, 1);//, 4, false, 0, 0, true);
 		display.setFramebuffer(texture);	
 		
 	}
